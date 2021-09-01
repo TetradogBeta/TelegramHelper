@@ -21,29 +21,30 @@ class DicMetodo:
     def Execute(self,text,args):
         encontrado=False;
         Result=None;
-        for reg in self.Regex:
-            if self.Regex[reg][0].match(text):
-                result=self.Regex[reg][1](args);
-                encontrado=True;
-                break;
-        if not encontrado:
-            for starts in self.DicStarts:
-                if text.startswith(starts):
-                    result=self.DicStarts[starts](args);
+        if text is not None:
+            for reg in self.Regex:
+                if self.Regex[reg][0].match(text):
+                    result=self.Regex[reg][1](args);
                     encontrado=True;
                     break;
-        if not encontrado:
-            for ends in self.DicEnds:
-                if text.endswith(ends):
-                    result=self.DicEnds[ends](args);
-                    encontrado=True;
-                    break;
-        if not encontrado:
-            for contains in self.DicContains:
-                if contains in text:
-                    result=self.DicContains[contains](args);
-                    encontrado=True;
-                    break;
+            if not encontrado:
+                for starts in self.DicStarts:
+                    if text.startswith(starts):
+                        result=self.DicStarts[starts](args);
+                        encontrado=True;
+                        break;
+            if not encontrado:
+                for ends in self.DicEnds:
+                    if text.endswith(ends):
+                        result=self.DicEnds[ends](args);
+                        encontrado=True;
+                        break;
+            if not encontrado:
+                for contains in self.DicContains:
+                    if contains in text:
+                        result=self.DicContains[contains](args);
+                        encontrado=True;
+                        break;
         if not encontrado:
             result=self.Default(args);
 

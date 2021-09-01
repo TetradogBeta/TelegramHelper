@@ -17,20 +17,20 @@ class Client:
     @property
     def IsACommand(self):
         return self.Args is not None and self.Command is not None;
-    def SendMessage(self,text: str)->int:
+    def SendMessage(self,text: str):
         return self.Bot.send_message(chat_id=self.ChatId,text=text);
 
-    def SendPhoto(self,photo,desc="")->int:
+    def SendPhoto(self,photo,desc=""):
         result=None;
         if isinstance(photo, bytearray):
             result=self.SendByteArrayPhoto(photo,desc);
         elif isinstance(photo, str):
-            if "http" in photo:
+            if photo.startswith("http"):
                 result=self.SendUrlPhoto(photo,desc);
             else:
                 result=self.SendFilePhoto(photo,desc);
         else:
-            yield Exception("only byteArray and str (http or filePath)");
+            raise Exception("only byteArray and str (http or filePath)");
         
         return result;
 

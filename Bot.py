@@ -20,9 +20,9 @@ class Bot:
 
     def _Execute(self,context,update):
         cli=Client.FromBot(context, update);
-        if not cli.IsACommand:
+        if not cli.IsACommand or cli.Command not in self.Commands:
             self.Default.Execute(self.SelectArg(cli.Args), cli);
-        elif cli.Command in self.Commands:
+        else:
             self.Commands[cli.Command](cli);
             
 
@@ -34,7 +34,7 @@ class Bot:
             self.AddCommand(command, dicCommands[command]);
 
     def AddCommandPlus(self,command:str,dicMetodo:DicMetodo):
-        metodo=lambda cli:DicMetodo.Execute(self.SelectArg(cli.Args),cli);
+        metodo=lambda cli:dicMetodo.Execute(self.SelectArg(cli.Args),cli);
         self.AddCommand(command, metodo);
 
     def AddCommandsPlus(self,dicCommands):

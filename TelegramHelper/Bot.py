@@ -16,25 +16,30 @@ class Bot:
         self.Default=DicMetodo();
         self.Commands={};
         self.ReplyAllowed=replyAllowed;
+        self.ReplyTractament=lambda cli:"";
         method=lambda update,context:self._Execute(context,update);
         self.Dispatcher.add_handler(MessageHandler(Filters.text, method));
 
     def _Execute(self,context,update):
-        cli=Client.FromBot(context, update);
-        command=None;
+        try:
+            cli=Client.FromBot(context, update);
+            command=None;
+            if self.ReplyAllowed and cli.IsAReply:
+                self.ReplyTractament(cli);
+            if self.ReplyAllowed and cli.IsAReply and len(cli.Args)==0:
+                command=cli.ReplyCommand;
+                args=cli.ReplyArgs;
+            else:
+                if cli.IsACommand:
+                    command=cli.Command;
+                args=cli.Args;
 
-        if self.ReplyAllowed and cli.IsAReply and len(cli.Args)==0:
-            command=cli.ReplyCommand;
-            args=cli.ReplyArgs;
-        else:
-            if cli.IsACommand:
-                command=cli.Command;
-            args=cli.Args;
-
-        if command is None or command not in self.Commands:
-            self.Default.Execute(self.SelectArg(args), cli);
-        else:
-            self.Commands[command](cli,args);
+            if command is None or command not in self.Commands:
+                self.Default.Execute(self.SelectArg(args), cli);
+            else:
+                self.Commands[command](cli,args);
+        except Exception as e:
+            print(e);
             
 
     def AddCommand(self,command:str,method):

@@ -17,7 +17,14 @@ class Client:
         self.ReplyFrom=None;
         self.User=None;
         self.Id=None;
+        self.IsForwardMessage=False;
 
+    @property
+    def IsAReplyFromBot(self):
+        resp=self.ReplyId is not None;
+        if resp:
+            resp=self.ReplyFrom.id==self.Bot.id;
+        return resp;
     @property
     def IsAReply(self):
         return self.Reply is not None and self.ReplyId is not None and self.ReplyFrom is not None;
@@ -27,6 +34,9 @@ class Client:
     @property
     def IsACommand(self):
         return self.Args is not None and self.Command is not None;
+
+    def ReplyWithText(self,chatIdToReply:int,text:str):
+        return self.Bot.send_message(chat_id=self.ChatId,reply_to_message_id=chatIdToReply,text=text);
 
     def SendMessage(self,text: str):
         return self.Bot.send_message(chat_id=self.ChatId,text=text);
@@ -125,12 +135,17 @@ class Client:
             client.Command=str(client.Args[0][1:]).lower();
             client.Args=client.Args[1:];
         try:#más adelante si se puede mirar de tener todo el arbol de replicas así no faltará ningun mensaje
-            client.Reply=update.message.reply_to_message.text;
-            client.ReplyId=update.message.reply_to_message.message_id;
-            client.ReplyFrom=update.message.reply_to_message.from_user;
+            reply=update.message.reply_to_message;
+            try:
+                client.Reply=reply.caption;
+            except:
+                client.Reply=reply.text;
+
+            client.ReplyId=reply.message_id;
+            client.ReplyFrom=reply.from_user;
             if client.Reply.startswith("/"):
                 replyArgs=client.Reply.split(" ");
-                client.ReplyCommand=str(replyArgs[0][1:]);
+                client.ReplyCommand=str(replyArgs[0][1:]).lower();
                 client.ReplyArgs=replyArgs[1:];
         except:
             pass;

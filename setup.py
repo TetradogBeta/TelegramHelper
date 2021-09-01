@@ -1,7 +1,7 @@
 from setuptools import setup
 setup(
     name="TelegramHelper",
-    version="1.2",
+    version="1.3",
     description="Sirve para ayudar en la tarea de hacer bots de telegram",
     author="GabrielCatDeveloper",
     author_email="gabriel.cat.developer@gmail.com",

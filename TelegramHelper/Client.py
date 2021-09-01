@@ -22,42 +22,72 @@ class Client:
     @property
     def IsACommand(self):
         return self.Args is not None and self.Command is not None;
+
     def SendMessage(self,text: str):
         return self.Bot.send_message(chat_id=self.ChatId,text=text);
+    
+    def SendText(self,text:str):
+        return self.SendMessage(text);
 
     def SendPhoto(self,photo,desc=""):
+        return self._Send(photo, desc, self.SendByteArrayPhoto, self.SendUrlPhoto, self.SendFilePhoto);
+
+    def SendVideo(self,video,desc=""):
+        return self._Send(video, desc, self.SendByteArrayVideo, self.SendUrlVideo, self.SendFileVideo);
+
+    def SendUrlPhoto(self,urlPhoto:str,desc=""):
+        return self.Bot.send_photo(chat_id=self.ChatId,photo=urlPhoto,caption=desc);
+
+    def SendUrlVideo(self,urlVideo:str,desc=""):
+        return self.Bot.send_video(chat_id=self.ChatId,video=urlVideo,caption=desc);
+
+    def SendFilePhoto(self,photoLocalPath:str,desc=""):
+        method=lambda id,photoStream,desc:self.Bot.send_photo(chat_id=id,photo=photoStream,caption=desc);
+        return self._SendFile(photoLocalPath,method,desc);
+
+    def SendFileVideo(self,videoLocalPath:str,desc=""):
+        method=lambda id,videoStream,desc:self.Bot.send_video(chat_id=id,video=videoStream,caption=desc);
+        return self._SendFile(videoLocalPath,method,desc);
+
+
+    def SendByteArrayPhoto(self,photoBytes:bytearray,desc=""):
+        return self._SendByteArray(photoBytes, self.SendFilePhoto,desc);
+
+    def SendByteArrayVideo(self,videoBytes:bytearray,desc=""):
+        return self._SendByteArray(videoBytes, self.SendFileVideo,desc);
+
+    def _Send(self,data,desc,sendByteArry,sendUrl,sendFile):
         result=None;
-        if isinstance(photo, bytearray):
-            result=self.SendByteArrayPhoto(photo,desc);
-        elif isinstance(photo, str):
-            if photo.startswith("http"):
-                result=self.SendUrlPhoto(photo,desc);
+        if isinstance(data, bytearray):
+            result=sendByteArry(data,desc);
+        elif isinstance(data, str):
+            if data.startswith("http"):
+                result=sendUrl(data,desc);
             else:
-                result=self.SendFilePhoto(photo,desc);
+                result=sendFile(data,desc);
         else:
             raise Exception("only byteArray and str (http or filePath)");
         
         return result;
 
-    def SendUrlPhoto(self,urlPhoto:str,desc=""):
-        return self.Bot.send_photo(chat_id=self.ChatId,photo=urlPhoto,caption=desc);
-    def SendFilePhoto(self,photoLocalPath:str,desc=""):
-        photo=None;
+    def _SendFile(self,pathFile:str,method,desc):
+        file=None;
         try:
-            photo=open(photoLocalPath,'rb');
-            id= self.Bot.send_photo(chat_id=self.ChatId,photo=photo,caption=desc);
+            file=open(pathFile,'rb');
+            id= method(self.ChatId,file,desc);
         finally:
-            if photo is not None:
-                photo.close(); 
+            if file is not None:
+                file.close(); 
         return id;
-    def SendByteArrayPhoto(self,photoBytes:bytearray,desc=""):
+
+    def _SendByteArray(self,bytesFile:bytearray,method,desc):
         fileName=str(uuid.uuid4());
         result=None;
         try:
             with open(fileName, 'wb') as f:
-                f.write(photoBytes);
+                f.write(bytesFile);
             try:
-                result=self.SendFilePhoto(fileName,desc);
+                result=method(fileName,desc);
             finally:
                 os.remove(fileName);
         except:#lo tengo que poner

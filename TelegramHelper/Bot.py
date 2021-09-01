@@ -3,8 +3,8 @@ from telegram.ext import CommandHandler
 from telegram.ext import MessageHandler
 from telegram.ext import Filters
 
-from Client import Client
-from DicMetodo import DicMetodo
+from TelegramHelper.Client import Client
+from TelegramHelper.DicMetodo import DicMetodo
 
 class Bot:
     def __init__(self,token:str,name=None):

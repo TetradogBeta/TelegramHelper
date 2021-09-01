@@ -10,7 +10,12 @@ class Client:
         self.Update=None;
         self.Args=None;
         self.Command=None;
-    
+        self.Reply=None;
+        self.ReplyId=None;
+        self.ReplyFrom=None;
+    @property
+    def IsAReply(self):
+        return self.Reply is not None and self.ReplyId is not None and self.ReplyFrom is not None;
     @property
     def IsFromBot(self):
         return self.Context is not None and self.Update is not None;
@@ -81,4 +86,10 @@ class Client:
         if client.Args is not None and len(client.Args)>0 and client.Args[0].startswith("/"):
             client.Command=str(client.Args[0][1:]).lower();
             client.Args=client.Args[1:];
+        try:#más adelante si se puede mirar de tener todo el arbol de replicas así no faltará ningun mensaje
+            client.Reply=update.message.reply_to_message.text;
+            client.ReplyId=update.message.reply_to_message.message_id;
+            client.ReplyFrom=update.message.reply_to_message.from_user;
+        except:
+            pass;
         return client;

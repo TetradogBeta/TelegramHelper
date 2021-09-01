@@ -6,6 +6,6 @@ setup(
     author="GabrielCatDeveloper",
     author_email="gabriel.cat.developer@gmail.com",
     url="https://github.com/TetradogBeta/TelegramHelper",
-    packages=["Source"],
+    packages=["TelegramHelper"],
     scripts=[]
 )

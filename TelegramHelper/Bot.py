@@ -7,7 +7,7 @@ from TelegramHelper.Client import Client
 from TelegramHelper.DicMetodo import DicMetodo
 
 class Bot:
-    def __init__(self,token:str,name=None):
+    def __init__(self,token:str,name=None,replyAllowed=True):
         self.Token=token;
         self.Updater=Updater(token=self.Token,use_context=True);
         self.Dispatcher=self.Updater.dispatcher;
@@ -15,15 +15,26 @@ class Bot:
         self.SelectArg=Bot._SelectArg;
         self.Default=DicMetodo();
         self.Commands={};
+        self.ReplyAllowed=replyAllowed;
         method=lambda update,context:self._Execute(context,update);
         self.Dispatcher.add_handler(MessageHandler(Filters.text, method));
 
     def _Execute(self,context,update):
         cli=Client.FromBot(context, update);
-        if not cli.IsACommand or cli.Command not in self.Commands:
-            self.Default.Execute(self.SelectArg(cli.Args), cli);
+        command=None;
+
+        if self.ReplyAllowed and cli.IsAReply and len(cli.Args)==0:
+            command=cli.ReplyCommand;
+            args=cli.ReplyArgs;
         else:
-            self.Commands[cli.Command](cli);
+            if cli.IsACommand:
+                command=cli.Command;
+            args=cli.Args;
+
+        if command is None or command not in self.Commands:
+            self.Default.Execute(self.SelectArg(args), cli);
+        else:
+            self.Commands[command](cli,args);
             
 
     def AddCommand(self,command:str,method):
@@ -34,7 +45,7 @@ class Bot:
             self.AddCommand(command, dicCommands[command]);
 
     def AddCommandPlus(self,command:str,dicMetodo:DicMetodo):
-        metodo=lambda cli:dicMetodo.Execute(self.SelectArg(cli.Args),cli);
+        metodo=lambda cli,args:dicMetodo.Execute(self.SelectArg(args),cli);
         self.AddCommand(command, metodo);
 
     def AddCommandsPlus(self,dicCommands):

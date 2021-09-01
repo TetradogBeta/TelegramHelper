@@ -11,8 +11,13 @@ class Client:
         self.Args=None;
         self.Command=None;
         self.Reply=None;
+        self.ReplyCommand=None;
+        self.ReplyArgs=None;
         self.ReplyId=None;
         self.ReplyFrom=None;
+        self.User=None;
+        self.Id=None;
+
     @property
     def IsAReply(self):
         return self.Reply is not None and self.ReplyId is not None and self.ReplyFrom is not None;
@@ -106,6 +111,9 @@ class Client:
         client= Client(context.bot,update.effective_chat.id);
         client.Context=context;
         client.Update=update;
+        client.User=update.effective_user;
+        client.Id=client.User.id;
+
         if context.args is not None:
             client.Args=context.args;
         else:
@@ -120,6 +128,10 @@ class Client:
             client.Reply=update.message.reply_to_message.text;
             client.ReplyId=update.message.reply_to_message.message_id;
             client.ReplyFrom=update.message.reply_to_message.from_user;
+            if client.Reply.startswith("/"):
+                replyArgs=client.Reply.split(" ");
+                client.ReplyCommand=str(replyArgs[0][1:]);
+                client.ReplyArgs=replyArgs[1:];
         except:
             pass;
         return client;

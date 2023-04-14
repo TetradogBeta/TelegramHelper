@@ -1,7 +1,5 @@
-from telegram.ext import Updater
-from telegram.ext import CommandHandler
-from telegram.ext import MessageHandler
-from telegram.ext import filters
+from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
+from telegram import ForceReply, Update
 
 from TelegramHelper.TelegramHelper.Client import Client
 from TelegramHelper.TelegramHelper.DicMetodo import DicMetodo
@@ -9,18 +7,17 @@ from TelegramHelper.TelegramHelper.DicMetodo import DicMetodo
 class Bot:
     def __init__(self,token:str,name=None,replyAllowed=True):
         self.Token=token;
-        self.Updater=Updater(token=self.Token,use_context=True);
-        self.Dispatcher=self.Updater.dispatcher;
+        self.Application=Application.builder().token(token).build();
         self.Name=name;
         self.SelectArg=Bot._SelectArg;
         self.Default=DicMetodo();
         self.Commands={};
         self.ReplyAllowed=replyAllowed;
         self.ReplyTractament=lambda cli:"";
-        method=lambda update,context:self._Execute(context,update);
-        self.Dispatcher.add_handler(MessageHandler(filters.text, method));
+        method=lambda update,context:self._Execute(update,context);
+        self.Application.add_handler(MessageHandler(filters.Text(), method));
 
-    def _Execute(self,context,update):
+    async def _Execute(self,update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             cli=Client.FromBot(context, update);
             command=None;
@@ -35,9 +32,9 @@ class Bot:
                 args=cli.Args;
 
             if command is None or command not in self.Commands:
-                self.Default.Execute(self.SelectArg(args), cli);
+                self.Default.Execute(self.SelectArg(args),cli);
             else:
-                self.Commands[command](cli,args);
+                await self.Commands[command](cli,args);
         except Exception as e:
             print(e);
             
@@ -57,15 +54,15 @@ class Bot:
         for command in dicCommands:
             self.AddCommandPlus(command, dicCommands[command]);
 
-    def Start(self,wait=True):
-        self.Updater.start_polling();
+    def Start(self):
+        
         if self.Name is not None:
             print("Start Bot "+self.Name);
-        if wait:
-            self.Updater.idle();
+        
+        self.Application.run_polling();
     
     def Stop(self):
-        self.Updater.stop();
+        self.Application.stop();
         if self.Name is not None:
             print("Stop Bot "+self.Name);
     @staticmethod

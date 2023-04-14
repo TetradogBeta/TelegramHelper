@@ -1,10 +1,10 @@
 from telegram.ext import Updater
 from telegram.ext import CommandHandler
 from telegram.ext import MessageHandler
-from telegram.ext import Filters
+from telegram.ext import filters
 
-from TelegramHelper.Client import Client
-from TelegramHelper.DicMetodo import DicMetodo
+from TelegramHelper.TelegramHelper.Client import Client
+from TelegramHelper.TelegramHelper.DicMetodo import DicMetodo
 
 class Bot:
     def __init__(self,token:str,name=None,replyAllowed=True):
@@ -18,7 +18,7 @@ class Bot:
         self.ReplyAllowed=replyAllowed;
         self.ReplyTractament=lambda cli:"";
         method=lambda update,context:self._Execute(context,update);
-        self.Dispatcher.add_handler(MessageHandler(Filters.text, method));
+        self.Dispatcher.add_handler(MessageHandler(filters.text, method));
 
     def _Execute(self,context,update):
         try:

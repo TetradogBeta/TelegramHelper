@@ -40,6 +40,9 @@ class Client:
 
     def SendMessage(self,text: str):
         return self.Bot.send_message(chat_id=self.ChatId,text=text);
+
+    def SendHtml(self,html:str):
+        return self.Bot.send_message(chat_id=self.ChatId,text=html,parse_mode='HTML');
     
     def SendText(self,text:str):
         return self.SendMessage(text);

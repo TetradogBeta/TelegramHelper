@@ -1,5 +1,6 @@
 import os
 import uuid
+from telegram import KeyboardButton,ReplyKeyboardMarkup,Update
 
 
 class Client:
@@ -18,6 +19,7 @@ class Client:
         self.User=None;
         self.Id=None;
         self.IsForwardMessage=False;
+        self.Contact=None;
 
     @property
     def IsAReplyFromBot(self):
@@ -34,6 +36,11 @@ class Client:
     @property
     def IsACommand(self):
         return self.Args is not None and self.Command is not None;
+
+    def StartContactRequest(self,text:str,btnName:str='Send contact'):
+        replyMarkup = ReplyKeyboardMarkup([[KeyboardButton(text=btnName, request_contact=True)]],
+                                            resize_keyboard=True);
+        return self.Bot.send_message(chat_id=self.ChatId,text=text,reply_markup=replyMarkup);
 
     def ReplyWithText(self,chatIdToReply:int,text:str):
         return self.Bot.send_message(chat_id=self.ChatId,reply_to_message_id=chatIdToReply,text=text);
@@ -120,7 +127,7 @@ class Client:
         return Client(bot,chatId);
     
     @staticmethod
-    def FromBot(context,update):
+    def FromBot(context,update:Update):
         client= Client(context.bot,update.effective_chat.id);
         client.Context=context;
         client.Update=update;
@@ -130,7 +137,14 @@ class Client:
         if context.args is not None:
             client.Args=context.args;
         else:
-            if " " not in update.message.text:
+            if   update.effective_message.contact is not None:
+                client.Contact={
+                    "firstName":str(update.effective_message.contact.first_name),
+                    "lastName":str(update.effective_message.contact.last_name),
+                    "phone":str(update.effective_message.contact.phone_number),
+                    "id":str(update.effective_message.contact.user_id),
+                };
+            elif update.message is not None and " " not in update.message.text:
                 client.Args=[update.message.text];
             else:
                 client.Args=update.message.text.split(" ");

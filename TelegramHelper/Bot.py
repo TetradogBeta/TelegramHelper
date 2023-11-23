@@ -24,18 +24,19 @@ class Bot:
             command=None;
             if self.ReplyAllowed and (cli.IsAReply or cli.IsAReplyFromBot):
                 await self.ReplyTractament(cli);
-            if self.ReplyAllowed and cli.IsAReply and len(cli.Args)==0:
-                command=cli.ReplyCommand;
-                args=cli.ReplyArgs;
             else:
-                if cli.IsACommand:
-                    command=cli.Command;
-                args=cli.Args;
+                if self.ReplyAllowed and cli.IsAReply and len(cli.Args)==0:
+                    command=cli.ReplyCommand;
+                    args=cli.ReplyArgs;
+                else:
+                    if cli.IsACommand:
+                        command=cli.Command;
+                    args=cli.Args;
 
-            if command is None or command not in self.Commands:
-                self.Default.Execute(self.SelectArg(args),cli);
-            else:
-                await self.Commands[command](cli,args);
+                if command is None or command not in self.Commands:
+                    self.Default.Execute(self.SelectArg(args),cli);
+                else:
+                    await self.Commands[command](cli,args);
         except Exception as e:
             print(e);
             

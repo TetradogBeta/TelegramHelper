@@ -16,13 +16,14 @@ class Bot:
         self.ReplyTractament=lambda cli:"";
         method=lambda update,context:self._Execute(update,context);
         self.Application.add_handler(MessageHandler(filters.Text(), method));
+        self.Application.add_handler(MessageHandler(filters.CONTACT, method));
 
     async def _Execute(self,update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             cli=Client.FromBot(context, update);
             command=None;
-            if self.ReplyAllowed and cli.IsAReply:
-                self.ReplyTractament(cli);
+            if self.ReplyAllowed and (cli.IsAReply or cli.IsAReplyFromBot):
+                await self.ReplyTractament(cli);
             if self.ReplyAllowed and cli.IsAReply and len(cli.Args)==0:
                 command=cli.ReplyCommand;
                 args=cli.ReplyArgs;

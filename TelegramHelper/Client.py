@@ -1,6 +1,6 @@
 import os
 import uuid
-from telegram import KeyboardButton,ReplyKeyboardMarkup,Update
+from telegram import KeyboardButton,ReplyKeyboardMarkup,ReplyKeyboardRemove,Update
 
 
 class Client:
@@ -41,6 +41,9 @@ class Client:
         replyMarkup = ReplyKeyboardMarkup([[KeyboardButton(text=btnName, request_contact=True)]],
                                             resize_keyboard=True);
         return self.Bot.send_message(chat_id=self.ChatId,text=text,reply_markup=replyMarkup);
+
+    def FinishContactRequest(self,text:str):
+        return self.Bot.send_message(chat_id=self.ChatId,text=text,reply_markup=ReplyKeyboardRemove());
 
     def ReplyWithText(self,chatIdToReply:int,text:str):
         return self.Bot.send_message(chat_id=self.ChatId,reply_to_message_id=chatIdToReply,text=text);

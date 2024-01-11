@@ -20,6 +20,7 @@ class Client:
         self.Id=None;
         self.IsForwardMessage=False;
         self.Contact=None;
+        self.LangCode=None;
 
     @property
     def IsAReplyFromBot(self):
@@ -136,7 +137,8 @@ class Client:
         client.Update=update;
         client.User=update.effective_user;
         client.Id=client.User.id;
-
+        client.LangCode=update.effective_user.language_code;
+        
         if context.args is not None:
             client.Args=context.args;
         else:

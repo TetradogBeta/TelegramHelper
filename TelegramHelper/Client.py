@@ -1,11 +1,12 @@
 import os
 import uuid
 from telegram import KeyboardButton,ReplyKeyboardMarkup,ReplyKeyboardRemove,Update
-
+from telegram.ext import  ContextTypes
+from telegram.ext._utils.types import  BT
 
 class Client:
     def __init__(self,bot,chatId:int):
-        self.Bot=bot;
+        self.Bot:BT=bot;
         self.ChatId=chatId;
         self.Context=None;
         self.Update=None;
@@ -38,6 +39,10 @@ class Client:
     def IsACommand(self):
         return self.Args is not None and self.Command is not None;
 
+
+    def AddButton(self,btnName:str):
+        replayKeyBoard= ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(btnName); 
+        
     def StartContactRequest(self,text:str,btnName:str='Send contact'):
         replyMarkup = ReplyKeyboardMarkup([[KeyboardButton(text=btnName, request_contact=True)]],
                                             resize_keyboard=True);
@@ -131,7 +136,7 @@ class Client:
         return Client(bot,chatId);
     
     @staticmethod
-    def FromBot(context,update:Update):
+    def FromBot(context:ContextTypes.DEFAULT_TYPE,update:Update):
         client= Client(context.bot,update.effective_chat.id);
         client.Context=context;
         client.Update=update;

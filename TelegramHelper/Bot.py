@@ -34,7 +34,7 @@ class Bot:
                     args=cli.Args;
 
                 if command is None or command not in self.Commands:
-                    self.Default.Execute(self.SelectArg(args),cli);
+                    await self.Default.Execute(self.SelectArg(args),cli);
                 else:
                     await self.Commands[command](cli,args);
         except Exception as e:
@@ -70,8 +70,9 @@ class Bot:
     @staticmethod
     def _SelectArg(args):
         result=None;
-        if len(args)>1:
-            result=" ".join(args);
-        elif len(args)==1:
-            result=args[0];
+        if args is not None:
+            if len(args)>1:
+                result=" ".join(args);
+            elif len(args)==1:
+                result=args[0];
         return result;

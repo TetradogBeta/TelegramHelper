@@ -18,7 +18,7 @@ class DicMetodo:
     def AddRegex(self,regex:str,method):
         self.Regex[regex]=[re.compile(regex),method];
     
-    def Execute(self,text,args):
+    async def Execute(self,text,args):
         encontrado=False;
         Result=None;
         if text is not None:
@@ -48,7 +48,7 @@ class DicMetodo:
         if not encontrado:
             result=self.Default(args);
 
-        return result;
+        return await result;
 
     @staticmethod
     def _Default(cli):

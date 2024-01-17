@@ -5,7 +5,7 @@ from TelegramHelper.TelegramHelper.Client import Client
 from TelegramHelper.TelegramHelper.DicMetodo import DicMetodo
 
 class Bot:
-    def __init__(self,token:str,name=None,replyAllowed=True):
+    def __init__(self,token:str,name:str|None=None,replyAllowed=True):
         self.Token=token;
         self.Application=Application.builder().token(token).build();
         self.Name=name;

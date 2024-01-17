@@ -18,10 +18,10 @@ class Client:
         self.ReplyId=None;
         self.ReplyFrom=None;
         self.User=None;
-        self.Id=None;
+        self.Id:int|None=None;
         self.IsForwardMessage=False;
-        self.Contact=None;
-        self.LangCode=None;
+        self.Contact:TelegramContact|None=None;
+        self.LangCode:str|None=None;
 
     @property
     def IsAReplyFromBot(self):
@@ -148,12 +148,11 @@ class Client:
             client.Args=context.args;
         else:
             if   update.effective_message.contact is not None:
-                client.Contact={
-                    "firstName":str(update.effective_message.contact.first_name),
-                    "lastName":str(update.effective_message.contact.last_name),
-                    "phone":str(update.effective_message.contact.phone_number),
-                    "id":str(update.effective_message.contact.user_id),
-                };
+                client.Contact=TelegramContact(str(update.effective_message.contact.first_name),
+                    str(update.effective_message.contact.last_name),
+                    str(update.effective_message.contact.phone_number),
+                    str(update.effective_message.contact.user_id),
+                );
             elif update.message is not None and " " not in update.message.text:
                 client.Args=[update.message.text];
             else:
@@ -177,3 +176,15 @@ class Client:
         except:
             pass;
         return client;
+
+
+
+
+class TelegramContact:
+
+
+    def __init__(self,firstName,lastName,phone,id):
+        self.firstName=firstName;
+        self.lastName=lastName;
+        self.phone=phone;
+        self.id=id;
